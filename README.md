@@ -39,6 +39,10 @@ go install github.com/Emoe/kxss@latest
 ```bash
 chmod +x vedan.sh
 ```
+## Options
+-d, --domain: Specify the target domain (e.g., example.com).
+
+-h, --help: Display the help menu.
 
 Usage 🚀
 Basic Usage
@@ -46,3 +50,39 @@ Run the script with a target domain:
 ```bash
 ./vedan.sh -d example.com
 ```
+
+
+### Output 📂
+All output files are saved in the ~/vedan/ directory. Here’s an example of the files generated:
+
+~/vedan/
+├── domains_subfinder_example.com.txt
+├── domains_example.com.txt
+├── domains_example.com_resolved.txt
+├── xss_example.com.txt
+└── bug_bounty_tool.log
+
+### Dependencies 📦
+The following tools are required for Vedan to work:
+subfinder
+amass
+httprobe
+waybackurls
+kxss
+filter-resolved
+Refer to the requirements.txt file for more details.
+
+### Support and Contact 📧
+If you have any questions, suggestions, or need support, feel free to reach out:
+
+Email: devkumarmahto204@outlook.com
+
+### License 📄
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+### Acknowledgments 🙏
+Thanks to the creators of subfinder, amass, httprobe, waybackurls, and kxss for their amazing tools.
+
+Special thanks to the bug bounty community for their support and inspiration.
+
+Happy Hunting! 🐛🔍

@@ -23,4 +23,26 @@ Before using Vedan, ensure you have the following installed:
 ### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/devkumar-swipe/vedan.git
-cd vedan
+```
+### Step 2: Install Dependencies
+# Install Go-based tools
+```bash
+go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install github.com/owasp-amass/amass/v3/...@master
+go install github.com/tomnomnom/httprobe@latest
+go install github.com/tomnomnom/waybackurls@latest
+go install github.com/Emoe/kxss@latest
+
+```
+
+### Step 3: Make the Script Executable
+```bash
+chmod +x vedan.sh
+```
+
+Usage 🚀
+Basic Usage
+Run the script with a target domain:
+```bash
+./vedan.sh -d example.com
+```

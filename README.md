@@ -13,6 +13,10 @@ Vedan is a powerful and automated Bug Bounty Toolkit designed to simplify subdom
 
 ---
 
+## Environment 
+ - **This Tool is tested only in Kali and Parrot**
+
+ 
 ## Installation 🛠️
 
 ### Prerequisites

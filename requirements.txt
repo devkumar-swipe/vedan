@@ -1,9 +1,10 @@
-# Install Go-based tools
-go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install github.com/owasp-amass/amass/v3/...@master
-go install github.com/tomnomnom/httprobe@latest
-go install github.com/tomnomnom/waybackurls@latest
-go install github.com/Emoe/kxss@latest
+# System Dependencies
+subfinder
+amass
+golang
 
-# Install filter-resolved (if available)
-# If not available, replace it with an alternative tool or script.
+# Go Modules
+github.com/tomnomnom/httprobe@latest
+github.com/tomnomnom/waybackurls@latest
+github.com/Emoe/kxss@latest
+github.com/tomnomnom/assetfinder@latest

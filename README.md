@@ -65,6 +65,7 @@ Refer to the requirements.txt file for more details.
 
 ### Support and Contact 📧
 If you have any questions, suggestions, or need support, feel free to reach out:
+For collaboration feel free to contact.
 
 Email: devkumarmahto204@outlook.com
 

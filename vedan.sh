@@ -43,48 +43,56 @@ error() {
   exit 1
 }
 
-# Function to display help
-help_menu() {
-  header
-  echo -e "${YELLOW}Usage:${NC}"
-  echo -e "  ./vedan.sh [OPTIONS]"
-  echo -e "\n${YELLOW}Options:${NC}"
-  echo -e "  -d, --domain    Target domain (e.g., example.com)"
-  echo -e "  -h, --help      Display this help menu"
-  echo -e "\n${YELLOW}Example:${NC}"
-  echo -e "  ./vedan.sh -d example.com"
-  echo -e "${GREEN}$BANNER${NC}"
-  exit 0
-}
-
 # Function to check if a command exists
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-# Function to check dependencies
-check_dependencies() {
-  local dependencies=("subfinder" "amass" "filter-resolved" "httprobe" "waybackurls" "kxss")
-  for cmd in "${dependencies[@]}"; do
-    if ! command_exists "$cmd"; then
-      error "Command $cmd not found. Please install it using the instructions in requirements.txt."
-    fi
-  done
+# Function to install dependencies
+install_dependencies() {
+  log "Installing required dependencies..."
+
+  # Update system
+  sudo apt update -y && sudo apt install -y subfinder amass
+
+  # Install Go if not found
+  if ! command_exists go; then
+    log "Installing Go..."
+    sudo apt install -y golang
+  fi
+
+  # Set Go environment path
+  export PATH=$PATH:$(go env GOPATH)/bin
+  echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
+  source ~/.bashrc
+
+  # Install required Go tools
+  go install github.com/tomnomnom/httprobe@latest
+  go install github.com/tomnomnom/waybackurls@latest
+  go install github.com/Emoe/kxss@latest
+
+  # Install filter-resolved manually
+  go install github.com/tomnomnom/assetfinder@latest
+  if ! command_exists filter-resolved; then
+    log "Manually setting up filter-resolved..."
+    cd $(go env GOPATH)/src/github.com/tomnomnom/assetfinder
+    go build -o $GOPATH/bin/filter-resolved filter-resolved.go
+    cd -
+  fi
+
+  log "All dependencies installed successfully!"
 }
 
 # Function to create output directory
 create_output_dir() {
-  if [[ ! -d "$OUTPUT_DIR" ]]; then
-    log "Creating output directory: $OUTPUT_DIR"
-    mkdir -p "$OUTPUT_DIR" || error "Failed to create output directory!"
-  fi
+  [[ ! -d "$OUTPUT_DIR" ]] && mkdir -p "$OUTPUT_DIR"
 }
 
 # Function to validate domain format
 validate_domain() {
   local domain="$1"
   if [[ ! "$domain" =~ ^([a-zA-Z0-9][a-zA-Z0-9-]*\.)+[a-zA-Z]{2,}$ ]]; then
-    error "Invalid domain format. Please provide a valid domain (e.g., example.com)."
+    error "Invalid domain format. Use a valid domain (e.g., example.com)."
   fi
 }
 
@@ -96,42 +104,42 @@ run_tool() {
   local resolved_output="$OUTPUT_DIR/domains_$domain_resolved.txt"
   local xss_output="$OUTPUT_DIR/xss_$domain.txt"
 
-  log "Starting scan for domain: $domain"
+  log "Scanning domain: $domain"
 
   # Run subfinder
   log "Running subfinder..."
-  subfinder -d "$domain" -o "$subfinder_output" || error "Subfinder failed!"
+  subfinder -d "$domain" -o "$subfinder_output"
 
   # Run amass
   log "Running amass..."
-  amass enum --passive -d "$domain" -o "$amass_output" || error "Amass failed!"
+  amass enum --passive -d "$domain" -o "$amass_output"
 
   # Combine results
   log "Combining results..."
-  cat "$subfinder_output" | tee -a "$amass_output" || error "Failed to combine results!"
+  cat "$subfinder_output" >> "$amass_output"
 
   # Filter resolved domains
   log "Filtering resolved domains..."
-  if ! command_exists "filter-resolved"; then
-    error "filter-resolved not found. Please install it or replace it with an alternative."
-  fi
-  cat "$amass_output" | filter-resolved | tee -a "$resolved_output" || error "Failed to filter resolved domains!"
+  cat "$amass_output" | filter-resolved > "$resolved_output"
 
   # Run httprobe, waybackurls, and kxss
   log "Running httprobe, waybackurls, and kxss..."
-  cat "$resolved_output" | httprobe -p http:81 -p http:8080 -p https:8443 | waybackurls | kxss | tee "$xss_output" || error "Failed to run httprobe, waybackurls, or kxss!"
+  cat "$resolved_output" | httprobe -p http:81 -p http:8080 -p https:8443 | waybackurls | kxss > "$xss_output"
 
   log "Scan completed. Results saved in $xss_output"
-  log "Thank you for using $TOOL_NAME! For support, contact $CONTACT_EMAIL or visit $GITHUB_REPO."
 }
 
 # Main script
 main() {
   header
 
+  # Install dependencies if needed
+  install_dependencies
+
   # Parse arguments
   if [[ $# -eq 0 ]]; then
-    help_menu
+    log "No arguments provided. Use -h for help."
+    exit 1
   fi
 
   while [[ $# -gt 0 ]]; do
@@ -141,7 +149,8 @@ main() {
         shift 2
         ;;
       -h|--help)
-        help_menu
+        echo -e "${YELLOW}Usage: ./vedan.sh -d <domain>${NC}"
+        exit 0
         ;;
       *)
         error "Invalid argument: $1"
@@ -149,21 +158,11 @@ main() {
     esac
   done
 
-  # Check if domain is provided
-  if [[ -z "$DOMAIN" ]]; then
-    error "Domain not provided! Use -d or --domain to specify a target domain."
-  fi
+  # Check domain
+  [[ -z "$DOMAIN" ]] && error "Domain not provided! Use -d <domain>."
 
-  # Validate domain format
   validate_domain "$DOMAIN"
-
-  # Check dependencies
-  check_dependencies
-
-  # Create output directory
   create_output_dir
-
-  # Run the tool
   run_tool "$DOMAIN"
 }
 

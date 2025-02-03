@@ -27,6 +27,8 @@ git clone https://github.com/devkumar-swipe/vedan.git
 ### Step 2: Install Dependencies
 # Install Go-based tools
 ```bash
+sudo apt update && sudo apt install golang -y
+
 go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 go install github.com/owasp-amass/amass/v3/...@master
 go install github.com/tomnomnom/httprobe@latest

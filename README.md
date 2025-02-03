@@ -24,20 +24,8 @@ Before using Vedan, ensure you have the following installed:
 ```bash
 git clone https://github.com/devkumar-swipe/vedan.git
 ```
-### Step 2: Install Dependencies
-# Install Go-based tools
-```bash
-sudo apt update && sudo apt install golang -y
 
-go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install github.com/owasp-amass/amass/v3/...@master
-go install github.com/tomnomnom/httprobe@latest
-go install github.com/tomnomnom/waybackurls@latest
-go install github.com/Emoe/kxss@latest
-
-```
-
-### Step 3: Make the Script Executable
+### Step 2: Make the Script Executable
 ```bash
 chmod +x vedan.sh
 ```
@@ -52,7 +40,8 @@ Run the script with a target domain:
 ```bash
 ./vedan.sh -d example.com
 ```
-
+**It will automatically download all dependencies which are required and executed.**
+![image](https://github.com/user-attachments/assets/1301b22f-ec76-4a06-b7b0-98278efd492a)
 
 ### Output 📂
 All output files are saved in the ~/vedan/ directory. Here’s an example of the files generated:
